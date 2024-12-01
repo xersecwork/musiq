@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Web App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f3f4f6;
+        }
+        .container {
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 50px;
+        }
+        h1 {
+            color: #2f2f2f;
+        }
+        p {
+            color: #6b6b6b;
+        }
+        .btn {
+            background-color: #0088cc;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Данные о пользователе</h1>
+    <p id="userData">Загрузка...</p>
+    <a href="#" class="btn" id="closeBtn">Закрыть</a>
+</div>
+
+<script>
+    // Инициализация Telegram Web App
+    Telegram.WebApp.init();
+
+    // Получение данных о пользователе
+    const user = Telegram.WebApp.initDataUnsafe;
+
+    // Функция для отображения данных о пользователе
+    function displayUserData() {
+        const userDataElement = document.getElementById('userData');
+        userDataElement.innerHTML = `
+            <strong>ID:</strong> ${user.user.id} <br>
+            <strong>Имя:</strong> ${user.user.first_name} <br>
+            <strong>Фамилия:</strong> ${user.user.last_name} <br>
+            <strong>Username:</strong> @${user.user.username} <br>
+            <strong>Язык:</strong> ${user.user.language_code} <br>
+        `;
+    }
+
+    // Вызов функции для отображения данных
+    displayUserData();
+
+    // Закрытие Web App
+    document.getElementById('closeBtn').onclick = function() {
+        Telegram.WebApp.close();
+    }
+</script>
+
+</body>
+</html>
