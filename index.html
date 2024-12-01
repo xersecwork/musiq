@@ -1,61 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Web App</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Telegram WebApp</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
+            background-color: #f5f5f5;
+            color: #333;
             margin: 0;
-            padding: 0;
-            background-color: #f3f4f6;
-        }
-        .container {
             padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            margin-top: 50px;
         }
-        h1 {
-            color: #2f2f2f;
+        .user-info {
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
-        p {
-            color: #6b6b6b;
+        .user-info img {
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            margin-bottom: 10px;
+        }
+        .user-info h1, .user-info p {
+            margin: 5px 0;
+            text-align: center;
         }
     </style>
 </head>
 <body>
+    <div class="user-info">
+        <img id="user-photo" src="" alt="User Photo">
+        <h1 id="user-name"></h1>
+        <p id="user-username"></p>
+        <p id="user-lang"></p>
+    </div>
+    <script>
+        const userData = {
+            "query_id": "AAHa60guAwAAANrrSC7K7n4C",
+            "user": {
+                "id": 7218981850,
+                "first_name": "м",
+                "last_name": "",
+                "username": "oggwe",
+                "language_code": "ru",
+                "allows_write_to_pm": true,
+                "photo_url": "https://t.me/i/userpic/320/agVvRrOS1jPlgYwzcoOUsfEAxx_HpaNVell_L2K8Sjxecwu_ipZ3bYMVFIc10aYA.svg"
+            },
+            "auth_date": "1733060647",
+            "signature": "P4WrAUWbUlF3S0ozaZNKlv46y435VqdnnkAJz9ZulQNS-MqND-haTi8Cw3fhxQltf3Gnoc48ggQ3PRqyEp7wDg",
+            "hash": "4cb1780ac5ab01edee4fd203aa9c5acec10ba5fd91b5cc2fe4cc76608d4b34ee"
+        };
 
-<div class="container">
-    <pre><code id="webview_data"></code></pre>
-</div>
-
-<script>
-    // Инициализация Telegram Web App
-    Telegram.WebApp.init();
-
-    // Получение данных о пользователе
-    const user = Telegram.WebApp.initDataUnsafe;
-
-    // Проверяем, если данные получены успешно
-    if (user && user.user) {
-        const userDataElement = document.getElementById('userData');
-        userDataElement.innerHTML = `
-            <strong>ID:</strong> ${user.user.id} <br>
-            <strong>Имя:</strong> ${user.user.first_name} <br>
-            <strong>Фамилия:</strong> ${user.user.last_name || 'Не указано'} <br>
-            <strong>Username:</strong> @${user.user.username || 'Не указано'} <br>
-            <strong>Язык:</strong> ${user.user.language_code || 'Не указано'} <br>
-        `;
-    } else {
-        const userDataElement = document.getElementById('userData');
-        userDataElement.innerHTML = 'Не удалось получить данные о пользователе. Пожалуйста, попробуйте снова.';
-    }
-</script>
-
+        // Заполнение информации о пользователе
+        document.getElementById('user-photo').src = userData.user.photo_url;
+        document.getElementById('user-name').textContent = `${userData.user.first_name} ${userData.user.last_name}`;
+        document.getElementById('user-username').textContent = `@${userData.user.username}`;
+        document.getElementById('user-lang').textContent = `Language: ${userData.user.language_code}`;
+    </script>
 </body>
 </html>
