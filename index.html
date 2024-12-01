@@ -2,63 +2,75 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Telegram WebApp</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram User Info</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f5f5f5;
-            color: #333;
             margin: 0;
             padding: 20px;
+            background-color: #f4f4f9;
+            color: #333;
         }
         .user-info {
-            padding: 20px;
             background: #fff;
+            padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .user-info img {
             border-radius: 50%;
-            width: 80px;
-            height: 80px;
-            margin-bottom: 10px;
+            width: 100px;
+            height: 100px;
+            display: block;
+            margin: 0 auto 15px;
         }
-        .user-info h1, .user-info p {
+        .user-info p {
             margin: 5px 0;
-            text-align: center;
+            word-wrap: break-word;
+        }
+        .user-info p span {
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
     <div class="user-info">
-        <img id="user-photo" src="" alt="User Photo">
-        <h1 id="user-name"></h1>
-        <p id="user-username"></p>
-        <p id="user-lang"></p>
+        <img id="photo" src="" alt="User Photo">
+        <p><span>User ID:</span> <span id="user-id"></span></p>
+        <p><span>First Name:</span> <span id="first-name"></span></p>
+        <p><span>Last Name:</span> <span id="last-name"></span></p>
+        <p><span>Username:</span> <span id="username"></span></p>
+        <p><span>Language Code:</span> <span id="language-code"></span></p>
+        <p><span>Allows Write to PM:</span> <span id="allows-write"></span></p>
+        <p><span>Auth Date:</span> <span id="auth-date"></span></p>
+        <p><span>Query ID:</span> <span id="query-id"></span></p>
     </div>
     <script>
         const userData = {
-            "query_id": "AAHa60guAwAAANrrSC7K7n4C",
+            "query_id": "",
             "user": {
                 "id": 7218981850,
-                "first_name": "м",
+                "first_name": "",
                 "last_name": "",
-                "username": "oggwe",
-                "language_code": "ru",
+                "username": "",
+                "language_code": "",
                 "allows_write_to_pm": true,
-                "photo_url": "https://t.me/i/userpic/320/agVvRrOS1jPlgYwzcoOUsfEAxx_HpaNVell_L2K8Sjxecwu_ipZ3bYMVFIc10aYA.svg"
+                "photo_url": ""
             },
-            "auth_date": "1733060647",
-            "signature": "P4WrAUWbUlF3S0ozaZNKlv46y435VqdnnkAJz9ZulQNS-MqND-haTi8Cw3fhxQltf3Gnoc48ggQ3PRqyEp7wDg",
-            "hash": "4cb1780ac5ab01edee4fd203aa9c5acec10ba5fd91b5cc2fe4cc76608d4b34ee"
+            "auth_date": ""
         };
 
-        // Заполнение информации о пользователе
-        document.getElementById('user-photo').src = userData.user.photo_url;
-        document.getElementById('user-name').textContent = `${userData.user.first_name} ${userData.user.last_name}`;
-        document.getElementById('user-username').textContent = `@${userData.user.username}`;
-        document.getElementById('user-lang').textContent = `Language: ${userData.user.language_code}`;
+        // Заполнение информации
+        document.getElementById('photo').src = userData.user.photo_url || 'https://via.placeholder.com/100';
+        document.getElementById('user-id').textContent = userData.user.id;
+        document.getElementById('first-name').textContent = userData.user.first_name || 'Not provided';
+        document.getElementById('last-name').textContent = userData.user.last_name || 'Not provided';
+        document.getElementById('username').textContent = userData.user.username || 'Not provided';
+        document.getElementById('language-code').textContent = userData.user.language_code || 'Not provided';
+        document.getElementById('allows-write').textContent = userData.user.allows_write_to_pm ? 'Yes' : 'No';
+        document.getElementById('auth-date').textContent = userData.auth_date || 'Not provided';
+        document.getElementById('query-id').textContent = userData.query_id || 'Not provided';
     </script>
 </body>
 </html>
