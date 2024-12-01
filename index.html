@@ -26,21 +26,13 @@
         p {
             color: #6b6b6b;
         }
-        .btn {
-            background-color: #0088cc;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 5px;
-            text-decoration: none;
-        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Данные о пользователе</h1>
+    <h1>Данные о пользователе 1</h1>
     <p id="userData">Загрузка...</p>
-    <a href="#" class="btn" id="closeBtn">Закрыть</a>
 </div>
 
 <script>
@@ -50,24 +42,19 @@
     // Получение данных о пользователе
     const user = Telegram.WebApp.initDataUnsafe;
 
-    // Функция для отображения данных о пользователе
-    function displayUserData() {
+    // Проверяем, если данные получены успешно
+    if (user && user.user) {
         const userDataElement = document.getElementById('userData');
         userDataElement.innerHTML = `
             <strong>ID:</strong> ${user.user.id} <br>
             <strong>Имя:</strong> ${user.user.first_name} <br>
-            <strong>Фамилия:</strong> ${user.user.last_name} <br>
-            <strong>Username:</strong> @${user.user.username} <br>
-            <strong>Язык:</strong> ${user.user.language_code} <br>
+            <strong>Фамилия:</strong> ${user.user.last_name || 'Не указано'} <br>
+            <strong>Username:</strong> @${user.user.username || 'Не указано'} <br>
+            <strong>Язык:</strong> ${user.user.language_code || 'Не указано'} <br>
         `;
-    }
-
-    // Вызов функции для отображения данных
-    displayUserData();
-
-    // Закрытие Web App
-    document.getElementById('closeBtn').onclick = function() {
-        Telegram.WebApp.close();
+    } else {
+        const userDataElement = document.getElementById('userData');
+        userDataElement.innerHTML = 'Не удалось получить данные о пользователе. Пожалуйста, попробуйте снова.';
     }
 </script>
 
