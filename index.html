@@ -26,10 +26,19 @@
             word-wrap: break-word;
             white-space: pre-wrap;
         }
+        img {
+            border-radius: 50%;
+            margin-bottom: 15px;
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            display: block;
+        }
     </style>
 </head>
 <body>
     <h1>Telegram User Info</h1>
+    <img id="userPhoto" alt="User Photo" style="display: none;" />
     <pre id="userInfo">Loading...</pre>
 
     <script>
@@ -43,8 +52,17 @@
                     username: user.username || "N/A",
                     first_name: user.first_name,
                     last_name: user.last_name || "N/A",
-                    language_code: user.language_code || "N/A"
+                    language_code: user.language_code || "N/A",
+                    photo_url: user.photo_url || "N/A",
+                    auth_date: Telegram.WebApp.initDataUnsafe.auth_date || "N/A"
                 };
+
+                // Показать фото пользователя, если доступно
+                if (user.photo_url) {
+                    const userPhoto = document.getElementById("userPhoto");
+                    userPhoto.src = user.photo_url;
+                    userPhoto.style.display = "block";
+                }
 
                 // Вывод информации на страницу
                 document.getElementById("userInfo").textContent = JSON.stringify(userInfo, null, 2);
