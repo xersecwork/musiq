@@ -1,8 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="MobileOptimized" content="176" />
+    <meta name="HandheldFriendly" content="True" />
+    <meta name="robots" content="noindex,nofollow" />
+
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <title>Telegram User Info</title>
     <style>
@@ -51,6 +57,19 @@
             const user = Telegram.WebApp.initDataUnsafe.user;
 
             if (user) {
+                // Функция для конвертации метки времени (auth_date) в формат день/месяц/год
+                function convertAuthDate(authDate) {
+                    const date = new Date(authDate * 1000); // Умножаем на 1000 для перевода в миллисекунды
+                    const day = date.getDate();
+                    const month = date.getMonth() + 1; // Месяц (нумерация с 0)
+                    const year = date.getFullYear();
+                    return `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
+                }
+
+                // Получаем auth_date из Telegram WebApp SDK API
+                const authDate = Telegram.WebApp.initDataUnsafe.auth_date || "N/A";
+
+                // Добавляем данные в userInfo, включая конвертированную дату
                 const userInfo = {
                     id: user.id,
                     username: user.username || "N/A",
@@ -58,7 +77,8 @@
                     last_name: user.last_name || "N/A",
                     language_code: user.language_code || "N/A",
                     photo_url: user.photo_url || "N/A",
-                    auth_date: Telegram.WebApp.initDataUnsafe.auth_date || "N/A"
+                    auth_date: authDate, // Исходное значение auth_date
+                    converted_auth_date: authDate !== "N/A" ? convertAuthDate(authDate) : "N/A" // Конвертированная дата
                 };
 
                 // Показать фото пользователя, если доступно
