@@ -1,103 +1,160 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="format-detection" content="telephone=no" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="MobileOptimized" content="176" />
-    <meta name="HandheldFriendly" content="True" />
-    <meta name="robots" content="noindex,nofollow" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Telegram To-Do List</title>
+  <link rel="stylesheet" href="styles.css">
 
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <title>Telegram User Info</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            background-color: var(--tg-theme-bg-color, #fff);
-            color: var(--tg-theme-text-color, #222);
-            margin: 0;
-            padding: 15px;
-        }
-        h1 {
-            font-size: 1.5em;
-            color: var(--tg-theme-link-color, #2678b6);
-        }
-        p {
-            color: rgba(216, 216, 216, 1);    
-        }
-        pre {
-            background: rgba(0, 0, 0, 0.07);
-            color: var(--tg-theme-text-color, #222);
-            font-size: 14px;
-            padding: 10px;
-            border-radius: 4px;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-        }
-        img {
-            border-radius: 50%;
-            margin-bottom: 15px;
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            display: block;
-        }
-    </style>
+    :root {
+  --bg-color: #ffffff;
+  --text-color: #000000;
+  --header-bg: #f1f1f1;
+}
+
+[data-theme="dark"] {
+  --bg-color: #121212;
+  --text-color: #ffffff;
+  --header-bg: #1e1e1e;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+}
+
+header {
+  background-color: var(--header-bg);
+  padding: 15px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+header button {
+  background-color: #0078d7;
+  color: #ffffff;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+header button:hover {
+  background-color: #005bb5;
+}
+
+main ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+main ul li {
+  background: var(--header-bg);
+  margin: 10px 0;
+  padding: 10px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+main ul li button {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+
+main ul li button:hover {
+  color: #ff0000;
+}
+
 </head>
 <body>
-    <h1>Telegram User Info</h1>
-    <p>version: 0.0.2</p>
-    <img id="userPhoto" alt="User Photo" style="display: none;" />
-    <pre id="userInfo">Loading...</pre>
+  <div class="container">
+    <header>
+      <h1>To-Do List</h1>
+      <button id="addTaskButton">Добавить задачу</button>
+    </header>
+    <main>
+      <ul id="taskList"></ul>
+    </main>
+  </div>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script>
+      document.addEventListener("DOMContentLoaded", () => {
+      const taskList = document.getElementById("taskList");
+      const addTaskButton = document.getElementById("addTaskButton");
+    
+      // Telegram Web App initialization
+      const tg = window.Telegram.WebApp;
+      tg.expand();
+    
+      // Apply theme
+      function applyTheme() {
+        const theme = tg.themeParams.bg_color === "#ffffff" ? "light" : "dark";
+        document.body.setAttribute("data-theme", theme);
+      }
+      applyTheme();
+    
+      // Load tasks from localStorage
+      function loadTasks() {
+        const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        taskList.innerHTML = "";
+        tasks.forEach((task, index) => {
+          const li = document.createElement("li");
+          li.textContent = task;
+          const deleteButton = document.createElement("button");
+          deleteButton.textContent = "❌";
+          deleteButton.onclick = () => deleteTask(index);
+          li.appendChild(deleteButton);
+          taskList.appendChild(li);
+        });
+      }
+    
+      // Add a new task
+      function addTask(task) {
+        const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        tasks.push(task);
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+        loadTasks();
+      }
+    
+      // Delete a task
+      function deleteTask(index) {
+        const tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        tasks.splice(index, 1);
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+        loadTasks();
+      }
+    
+      // Add task button click
+      addTaskButton.addEventListener("click", () => {
+        const task = prompt("Введите задачу:");
+        if (task) addTask(task);
+      });
+    
+      // Initial load
+      loadTasks();
+    });
 
-    <script>
-        // Функция для получения информации о пользователе
-        function getUserInfo() {
-            const user = Telegram.WebApp.initDataUnsafe.user;
-
-            if (user) {
-                // Функция для конвертации метки времени (auth_date) в формат день/месяц/год
-                function convertAuthDate(authDate) {
-                    const date = new Date(authDate * 1000); // Умножаем на 1000 для перевода в миллисекунды
-                    const day = date.getDate();
-                    const month = date.getMonth() + 1; // Месяц (нумерация с 0)
-                    const year = date.getFullYear();
-                    return `${day < 10 ? '0' + day : day}/${month < 10 ? '0' + month : month}/${year}`;
-                }
-
-                // Получаем auth_date из Telegram WebApp SDK API
-                const authDate = Telegram.WebApp.initDataUnsafe.auth_date || "N/A";
-
-                // Добавляем данные в userInfo, включая конвертированную дату
-                const userInfo = {
-                    id: user.id,
-                    username: user.username || "N/A",
-                    first_name: user.first_name,
-                    last_name: user.last_name || "N/A",
-                    language_code: user.language_code || "N/A",
-                    photo_url: user.photo_url || "N/A",
-                    auth_date: authDate, // Исходное значение auth_date
-                    converted_auth_date: authDate !== "N/A" ? convertAuthDate(authDate) : "N/A" // Конвертированная дата
-                };
-
-                // Показать фото пользователя, если доступно
-                if (user.photo_url) {
-                    const userPhoto = document.getElementById("userPhoto");
-                    userPhoto.src = user.photo_url;
-                    userPhoto.style.display = "block";
-                }
-
-                // Вывод информации на страницу
-                document.getElementById("userInfo").textContent = JSON.stringify(userInfo, null, 2);
-            } else {
-                document.getElementById("userInfo").textContent = "User information not available.";
-            }
-        }
-
-        // Инициализация Telegram Web App
-        Telegram.WebApp.ready();
-        getUserInfo();
-    </script>
+  </script>
 </body>
 </html>
