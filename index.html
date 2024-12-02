@@ -2,14 +2,156 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="format-detection" content="telephone=no" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="MobileOptimized" content="176" />
-    <meta name="HandheldFriendly" content="True" />
-    <meta name="robots" content="noindex,nofollow" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="format-detection" content="telephone=no" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="MobileOptimized" content="176" />
+  <meta name="HandheldFriendly" content="True" />
+  <meta name="robots" content="noindex,nofollow" />
   <title>Telegram To-Do List</title>
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    :root {
+      --bg-color: #ffffff;
+      --text-color: #000000;
+      --header-bg: #f1f1f1;
+      --task-completed: #c8e6c9;
+    }
+
+    [data-theme="dark"] {
+      --bg-color: #121212;
+      --text-color: #ffffff;
+      --header-bg: #1e1e1e;
+      --task-completed: #388e3c;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      overflow: hidden;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background-color: var(--header-bg);
+      padding: 15px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    header button {
+      background-color: #0078d7;
+      color: #ffffff;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    header button:hover {
+      background-color: #005bb5;
+    }
+
+    .task-list, .completed-tasks {
+      margin: 10px 0;
+      overflow-y: auto;
+      flex-grow: 1;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .task-item {
+      background: var(--header-bg);
+      margin: 10px 0;
+      padding: 15px;
+      border-radius: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.3s ease;
+    }
+
+    .task-item.completed {
+      background: var(--task-completed);
+    }
+
+    .task-item .actions {
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+      display: flex;
+      background: #ff4d4d;
+      gap: 10px;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .task-item .actions button {
+      background: none;
+      border: none;
+      color: white;
+      padding: 0 15px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .task-item.show-actions {
+      transform: translateX(-100px);
+    }
+
+    .task-item.show-actions .actions {
+      transform: translateX(0);
+    }
+
+    .completed-tasks {
+      background: var(--header-bg);
+      padding: 10px;
+      border-radius: 5px;
+      max-height: 150px;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .completed-tasks.show {
+      transform: translateY(0);
+    }
+
+    .toggle-completed {
+      text-align: center;
+      cursor: pointer;
+      padding: 10px;
+      background: var(--header-bg);
+      border-radius: 5px;
+      transition: background 0.3s ease;
+    }
+
+    .toggle-completed:hover {
+      background: #e0e0e0;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
@@ -18,10 +160,116 @@
       <button id="addTaskButton">Добавить задачу</button>
     </header>
     <main>
-      <ul id="taskList"></ul>
+      <ul class="task-list" id="taskList"></ul>
+      <div class="toggle-completed" id="toggleCompleted">Показать выполненные задачи</div>
+      <div class="completed-tasks" id="completedTasks">
+        <ul id="completedList"></ul>
+      </div>
     </main>
   </div>
+
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
-  <script src="script.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const tg = window.Telegram.WebApp;
+      tg.expand();
+
+      // Theme handling
+      function applyTheme() {
+        const theme = tg.themeParams.bg_color === "#ffffff" ? "light" : "dark";
+        document.body.setAttribute("data-theme", theme);
+      }
+      applyTheme();
+
+      const taskList = document.getElementById("taskList");
+      const completedList = document.getElementById("completedList");
+      const completedTasks = document.getElementById("completedTasks");
+      const toggleCompleted = document.getElementById("toggleCompleted");
+
+      let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+      let completedTasksList = JSON.parse(localStorage.getItem("completedTasks")) || [];
+
+      function saveTasks() {
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+        localStorage.setItem("completedTasks", JSON.stringify(completedTasksList));
+      }
+
+      function renderTasks() {
+        taskList.innerHTML = tasks.map((task, index) => `
+          <li class="task-item" data-index="${index}" draggable="false">
+            <span>${task}</span>
+            <div class="actions">
+              <button onclick="markCompleted(${index})">✔</button>
+              <button onclick="editTask(${index})">✏</button>
+              <button onclick="deleteTask(${index})">❌</button>
+            </div>
+          </li>`).join('');
+
+        completedList.innerHTML = completedTasksList.map(task => `
+          <li class="task-item completed">
+            <span>${task}</span>
+          </li>`).join('');
+      }
+
+      window.markCompleted = (index) => {
+        completedTasksList.push(tasks[index]);
+        tasks.splice(index, 1);
+        saveTasks();
+        renderTasks();
+      };
+
+      window.editTask = (index) => {
+        const newTask = prompt("Изменить задачу:", tasks[index]);
+        if (newTask) {
+          tasks[index] = newTask;
+          saveTasks();
+          renderTasks();
+        }
+      };
+
+      window.deleteTask = (index) => {
+        tasks.splice(index, 1);
+        saveTasks();
+        renderTasks();
+      };
+
+      document.getElementById("addTaskButton").addEventListener("click", () => {
+        const task = prompt("Введите задачу:");
+        if (task) {
+          tasks.push(task);
+          saveTasks();
+          renderTasks();
+        }
+      });
+
+      toggleCompleted.addEventListener("click", () => {
+        completedTasks.classList.toggle("show");
+        toggleCompleted.textContent = completedTasks.classList.contains("show") 
+          ? "Скрыть выполненные задачи" 
+          : "Показать выполненные задачи";
+      });
+
+      let startX = 0;
+      taskList.addEventListener("touchstart", (e) => {
+        if (e.target.closest(".task-item")) {
+          startX = e.touches[0].clientX;
+        }
+      });
+
+      taskList.addEventListener("touchmove", (e) => {
+        const taskItem = e.target.closest(".task-item");
+        if (taskItem) {
+          const deltaX = e.touches[0].clientX - startX;
+          if (deltaX < -50) {
+            taskItem.classList.add("show-actions");
+          } else if (deltaX > 50) {
+            taskItem.classList.remove("show-actions");
+          }
+        }
+      });
+
+      renderTasks();
+    });
+  </script>
 </body>
 </html>
