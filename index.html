@@ -13,159 +13,144 @@
     :root {
       --bg-color: #ffffff;
       --text-color: #000000;
-      --header-bg: #f1f1f1;
-      --task-completed: #c8e6c9;
+      --input-bg: #f1f3f4;
+      --button-bg: #0078d7;
+      --task-bg: #f1f3f4;
+      --task-completed-bg: #e0ffe0;
+      --task-border: #d3d3d3;
+      --action-complete: #34c759;
+      --action-edit: #007aff;
+      --action-delete: #ff3b30;
     }
 
     [data-theme="dark"] {
-      --bg-color: #121212;
+      --bg-color: #1c1c1e;
       --text-color: #ffffff;
-      --header-bg: #1e1e1e;
-      --task-completed: #388e3c;
+      --input-bg: #2c2c2e;
+      --button-bg: #0078d7;
+      --task-bg: #2c2c2e;
+      --task-completed-bg: #1e4620;
+      --task-border: #444;
+      --action-complete: #30d158;
+      --action-edit: #0a84ff;
+      --action-delete: #ff453a;
     }
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       background-color: var(--bg-color);
       color: var(--text-color);
-      overflow: hidden;
     }
 
     .container {
-      max-width: 600px;
+      max-width: 400px;
       margin: auto;
       padding: 20px;
-      height: 100vh;
       display: flex;
       flex-direction: column;
+      gap: 10px;
+      height: 100vh;
     }
 
-    header {
-      background-color: var(--header-bg);
-      padding: 15px;
-      border-radius: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    header h1 {
-      margin: 0;
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
       font-size: 1.5rem;
     }
 
-    header button {
-      background-color: #0078d7;
-      color: #ffffff;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background 0.3s ease;
+    .input-container {
+      display: flex;
+      gap: 10px;
     }
 
-    header button:hover {
+    input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid var(--task-border);
+      border-radius: 8px;
+      background-color: var(--input-bg);
+      color: var(--text-color);
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 10px 15px;
+      background-color: var(--button-bg);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
       background-color: #005bb5;
     }
 
-    .task-list, .completed-tasks {
-      margin: 10px 0;
-      overflow-y: auto;
-      flex-grow: 1;
-    }
-
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .task-item {
-      background: var(--header-bg);
-      margin: 10px 0;
+    .task {
+      background-color: var(--task-bg);
       padding: 15px;
-      border-radius: 5px;
+      border-radius: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      border: 1px solid var(--task-border);
       position: relative;
       overflow: hidden;
-      transition: transform 0.3s ease;
+      transition: transform 0.3s ease, background-color 0.3s ease;
     }
 
-    .task-item.completed {
-      background: var(--task-completed);
+    .task.completed {
+      background-color: var(--task-completed-bg);
     }
 
-    .task-item .actions {
-      position: absolute;
-      top: 0;
-      right: 0;
-      height: 100%;
+    .task span {
+      flex: 1;
+      word-break: break-word;
+    }
+
+    .task .actions {
       display: flex;
-      background: #ff4d4d;
-      gap: 10px;
-      transform: translateX(100%);
-      transition: transform 0.3s ease;
+      gap: 5px;
     }
 
-    .task-item .actions button {
+    .task .actions button {
       background: none;
       border: none;
-      color: white;
-      padding: 0 15px;
+      padding: 10px;
       font-size: 1rem;
       cursor: pointer;
+      color: white;
     }
 
-    .task-item.show-actions {
-      transform: translateX(-100px);
+    .task .actions .complete {
+      background-color: var(--action-complete);
     }
 
-    .task-item.show-actions .actions {
-      transform: translateX(0);
+    .task .actions .edit {
+      background-color: var(--action-edit);
     }
 
-    .completed-tasks {
-      background: var(--header-bg);
-      padding: 10px;
-      border-radius: 5px;
-      max-height: 150px;
-      transform: translateY(100%);
-      transition: transform 0.3s ease;
+    .task .actions .delete {
+      background-color: var(--action-delete);
     }
 
-    .completed-tasks.show {
-      transform: translateY(0);
-    }
-
-    .toggle-completed {
-      text-align: center;
-      cursor: pointer;
-      padding: 10px;
-      background: var(--header-bg);
-      border-radius: 5px;
-      transition: background 0.3s ease;
-    }
-
-    .toggle-completed:hover {
-      background: #e0e0e0;
+    .task-list {
+      flex: 1;
+      overflow-y: auto;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1>To-Do List</h1>
-      <button id="addTaskButton">Добавить задачу</button>
-    </header>
-    <main>
-      <ul class="task-list" id="taskList"></ul>
-      <div class="toggle-completed" id="toggleCompleted">Показать выполненные задачи</div>
-      <div class="completed-tasks" id="completedTasks">
-        <ul id="completedList"></ul>
-      </div>
-    </main>
+    <h1>Задачи</h1>
+    <div class="input-container">
+      <input type="text" id="taskInput" placeholder="Название задачи" />
+      <button id="addTaskButton">Добавить</button>
+    </div>
+    <div class="task-list" id="taskList"></div>
   </div>
 
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -181,90 +166,68 @@
       }
       applyTheme();
 
+      const taskInput = document.getElementById("taskInput");
+      const addTaskButton = document.getElementById("addTaskButton");
       const taskList = document.getElementById("taskList");
-      const completedList = document.getElementById("completedList");
-      const completedTasks = document.getElementById("completedTasks");
-      const toggleCompleted = document.getElementById("toggleCompleted");
 
       let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
-      let completedTasksList = JSON.parse(localStorage.getItem("completedTasks")) || [];
 
       function saveTasks() {
         localStorage.setItem("tasks", JSON.stringify(tasks));
-        localStorage.setItem("completedTasks", JSON.stringify(completedTasksList));
       }
 
       function renderTasks() {
-        taskList.innerHTML = tasks.map((task, index) => `
-          <li class="task-item" data-index="${index}" draggable="false">
-            <span>${task}</span>
-            <div class="actions">
-              <button onclick="markCompleted(${index})">✔</button>
-              <button onclick="editTask(${index})">✏</button>
-              <button onclick="deleteTask(${index})">❌</button>
-            </div>
-          </li>`).join('');
+        taskList.innerHTML = tasks
+          .map(
+            (task, index) => `
+            <div class="task ${task.completed ? "completed" : ""}" data-index="${index}">
+              <span>${task.text}</span>
+              <div class="actions">
+                <button class="complete" onclick="markCompleted(${index})">✔</button>
+                <button class="edit" onclick="editTask(${index})">✏</button>
+                <button class="delete" onclick="deleteTask(${index})">❌</button>
+              </div>
+            </div>`
+          )
+          .join("");
+      }
 
-        completedList.innerHTML = completedTasksList.map(task => `
-          <li class="task-item completed">
-            <span>${task}</span>
-          </li>`).join('');
+      function vibrate() {
+        if (navigator.vibrate) navigator.vibrate(50);
       }
 
       window.markCompleted = (index) => {
-        completedTasksList.push(tasks[index]);
-        tasks.splice(index, 1);
+        vibrate();
+        tasks[index].completed = !tasks[index].completed;
         saveTasks();
         renderTasks();
       };
 
       window.editTask = (index) => {
-        const newTask = prompt("Изменить задачу:", tasks[index]);
+        vibrate();
+        const newTask = prompt("Изменить задачу:", tasks[index].text);
         if (newTask) {
-          tasks[index] = newTask;
+          tasks[index].text = newTask;
           saveTasks();
           renderTasks();
         }
       };
 
       window.deleteTask = (index) => {
+        vibrate();
         tasks.splice(index, 1);
         saveTasks();
         renderTasks();
       };
 
-      document.getElementById("addTaskButton").addEventListener("click", () => {
-        const task = prompt("Введите задачу:");
-        if (task) {
-          tasks.push(task);
+      addTaskButton.addEventListener("click", () => {
+        vibrate();
+        const text = taskInput.value.trim();
+        if (text) {
+          tasks.push({ text, completed: false });
           saveTasks();
           renderTasks();
-        }
-      });
-
-      toggleCompleted.addEventListener("click", () => {
-        completedTasks.classList.toggle("show");
-        toggleCompleted.textContent = completedTasks.classList.contains("show") 
-          ? "Скрыть выполненные задачи" 
-          : "Показать выполненные задачи";
-      });
-
-      let startX = 0;
-      taskList.addEventListener("touchstart", (e) => {
-        if (e.target.closest(".task-item")) {
-          startX = e.touches[0].clientX;
-        }
-      });
-
-      taskList.addEventListener("touchmove", (e) => {
-        const taskItem = e.target.closest(".task-item");
-        if (taskItem) {
-          const deltaX = e.touches[0].clientX - startX;
-          if (deltaX < -50) {
-            taskItem.classList.add("show-actions");
-          } else if (deltaX > 50) {
-            taskItem.classList.remove("show-actions");
-          }
+          taskInput.value = "";
         }
       });
 
