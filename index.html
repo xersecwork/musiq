@@ -13,11 +13,9 @@
     :root {
       --bg-color: #ffffff;
       --text-color: #000000;
-      --input-bg: #f1f3f4;
-      --button-bg: #0078d7;
       --task-bg: #f1f3f4;
+      --button-bg: #0078d7;
       --task-completed-bg: #e0ffe0;
-      --task-border: #d3d3d3;
       --action-complete: #34c759;
       --action-edit: #007aff;
       --action-delete: #ff3b30;
@@ -26,11 +24,9 @@
     [data-theme="dark"] {
       --bg-color: #1c1c1e;
       --text-color: #ffffff;
-      --input-bg: #2c2c2e;
-      --button-bg: #0078d7;
       --task-bg: #2c2c2e;
+      --button-bg: #0078d7;
       --task-completed-bg: #1e4620;
-      --task-border: #444;
       --action-complete: #30d158;
       --action-edit: #0a84ff;
       --action-delete: #ff453a;
@@ -38,67 +34,39 @@
 
     body {
       margin: 0;
-      font-family: -apple-system, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       background-color: var(--bg-color);
       color: var(--text-color);
-    }
-
-    .container {
-      max-width: 400px;
-      margin: auto;
-      padding: 20px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
       height: 100vh;
     }
 
-    h1 {
-      text-align: center;
-      margin-bottom: 10px;
-      font-size: 1.5rem;
-    }
-
-    .input-container {
+    .header {
       display: flex;
-      gap: 10px;
+      justify-content: space-between;
+      padding: 10px 20px;
+      font-size: 1.5rem;
+      font-weight: bold;
     }
 
-    input {
+    .task-list {
       flex: 1;
+      overflow-y: auto;
       padding: 10px;
-      border: 1px solid var(--task-border);
-      border-radius: 8px;
-      background-color: var(--input-bg);
-      color: var(--text-color);
-      font-size: 1rem;
-    }
-
-    button {
-      padding: 10px 15px;
-      background-color: var(--button-bg);
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #005bb5;
     }
 
     .task {
       background-color: var(--task-bg);
       padding: 15px;
+      margin-bottom: 10px;
       border-radius: 8px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border: 1px solid var(--task-border);
       position: relative;
       overflow: hidden;
+      border: 1px solid #d3d3d3;
       transition: transform 0.3s ease, background-color 0.3s ease;
     }
 
@@ -108,18 +76,24 @@
 
     .task span {
       flex: 1;
+      margin-left: 10px;
       word-break: break-word;
     }
 
     .task .actions {
       display: flex;
-      gap: 5px;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: -120px;
+      width: 120px;
+      justify-content: space-between;
+      transition: right 0.3s ease;
     }
 
     .task .actions button {
-      background: none;
+      flex: 1;
       border: none;
-      padding: 10px;
       font-size: 1rem;
       cursor: pointer;
       color: white;
@@ -137,38 +111,80 @@
       background-color: var(--action-delete);
     }
 
-    .task-list {
-      flex: 1;
-      overflow-y: auto;
+    .add-task-button {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: var(--button-bg);
+      color: white;
+      font-size: 1.2rem;
+      text-align: center;
+      padding: 15px;
+      cursor: pointer;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal .content {
+      background: var(--bg-color);
+      padding: 20px;
+      border-radius: 10px;
+      width: 80%;
+    }
+
+    .modal input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 10px;
+      font-size: 1rem;
+    }
+
+    .modal button {
+      padding: 10px 15px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      background: var(--button-bg);
+      color: white;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Задачи</h1>
-    <div class="input-container">
-      <input type="text" id="taskInput" placeholder="Название задачи" />
-      <button id="addTaskButton">Добавить</button>
+  <div class="header">
+    <span>Задачи</span>
+    <span>Выполненные задачи</span>
+  </div>
+  <div class="task-list" id="taskList"></div>
+  <div class="add-task-button" id="addTaskButton">Добавить задачу</div>
+
+  <div class="modal" id="modal">
+    <div class="content">
+      <input type="text" id="taskInput" placeholder="Введите название задачи" />
+      <button id="saveTaskButton">Сохранить</button>
     </div>
-    <div class="task-list" id="taskList"></div>
   </div>
 
-  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      const tg = window.Telegram.WebApp;
-      tg.expand();
-
-      // Theme handling
-      function applyTheme() {
-        const theme = tg.themeParams.bg_color === "#ffffff" ? "light" : "dark";
-        document.body.setAttribute("data-theme", theme);
-      }
-      applyTheme();
-
-      const taskInput = document.getElementById("taskInput");
-      const addTaskButton = document.getElementById("addTaskButton");
       const taskList = document.getElementById("taskList");
+      const addTaskButton = document.getElementById("addTaskButton");
+      const modal = document.getElementById("modal");
+      const taskInput = document.getElementById("taskInput");
+      const saveTaskButton = document.getElementById("saveTaskButton");
 
       let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 
@@ -180,54 +196,58 @@
         taskList.innerHTML = tasks
           .map(
             (task, index) => `
-            <div class="task ${task.completed ? "completed" : ""}" data-index="${index}">
-              <span>${task.text}</span>
-              <div class="actions">
-                <button class="complete" onclick="markCompleted(${index})">✔</button>
-                <button class="edit" onclick="editTask(${index})">✏</button>
-                <button class="delete" onclick="deleteTask(${index})">❌</button>
-              </div>
-            </div>`
+          <div class="task ${task.completed ? "completed" : ""}" data-index="${index}">
+            <span>${task.text}</span>
+            <div class="actions">
+              <button class="complete" onclick="toggleTask(${index})">✔</button>
+              <button class="edit" onclick="editTask(${index})">✏</button>
+              <button class="delete" onclick="deleteTask(${index})">❌</button>
+            </div>
+          </div>`
           )
           .join("");
       }
 
-      function vibrate() {
-        if (navigator.vibrate) navigator.vibrate(50);
-      }
-
-      window.markCompleted = (index) => {
-        vibrate();
+      window.toggleTask = (index) => {
         tasks[index].completed = !tasks[index].completed;
         saveTasks();
         renderTasks();
       };
 
       window.editTask = (index) => {
-        vibrate();
-        const newTask = prompt("Изменить задачу:", tasks[index].text);
-        if (newTask) {
-          tasks[index].text = newTask;
+        taskInput.value = tasks[index].text;
+        modal.style.display = "flex";
+        saveTaskButton.onclick = () => {
+          tasks[index].text = taskInput.value;
           saveTasks();
           renderTasks();
-        }
+          modal.style.display = "none";
+        };
       };
 
       window.deleteTask = (index) => {
-        vibrate();
         tasks.splice(index, 1);
         saveTasks();
         renderTasks();
       };
 
       addTaskButton.addEventListener("click", () => {
-        vibrate();
+        modal.style.display = "flex";
+      });
+
+      saveTaskButton.addEventListener("click", () => {
         const text = taskInput.value.trim();
         if (text) {
           tasks.push({ text, completed: false });
           saveTasks();
           renderTasks();
-          taskInput.value = "";
+          modal.style.display = "none";
+        }
+      });
+
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) {
+          modal.style.display = "none";
         }
       });
 
